@@ -28,7 +28,6 @@ export default function Home() {
         setDisplayText(analysis.slice(0, displayText.length + 1));
       }, 4);
     } 
-    
   }, [displayText,analysis]);
 
   return (
@@ -42,10 +41,11 @@ export default function Home() {
               psychoanalyze.dev
             </h1>
             <textarea
-              className="max-w-[95%] h-40 bg-black bg-opacity-50 border border-gray-600 rounded-md text-white p-2 mb-4"
+              className="max-w-[95%] h-40 bg-black font-mono bg-opacity-50 border border-gray-600 rounded-md text-white p-2 mb-4"
               value={code}
               onChange={(event) => setCode(event.target.value)}
               placeholder="For some strange reason, you think showing your analyst a code snippet might be enlightening... (paste code here)"
+              spellCheck="false"
             />
             <button 
               className="bg-black bg-opacity-50 hover:bg-amber-800 hover:bg-opacity-80 rounded text-white font-mono w-16 mb-3 self-end mr-12"
