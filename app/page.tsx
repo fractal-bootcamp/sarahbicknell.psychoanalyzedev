@@ -7,9 +7,11 @@ export default function Home() {
   const [code, setCode] = useState("");
   const [analysis, setAnalysis] = useState("");
   const [displayText, setDisplayText] = useState("");
+  const [loading, setLoading] = useState(false);
  
 
   async function generateAnalysis() {
+    setLoading(true);
     try {
       const response = await axios.post('/api/generate-comments', { code });
       setAnalysis(response.data.message);
@@ -20,16 +22,17 @@ export default function Home() {
   }
 
   useEffect(() => {
+    setLoading(false);
     if (displayText.length < analysis.length) {
       setTimeout(() => {
-      setDisplayText(analysis.slice(0, displayText.length + 1));
+        setDisplayText(analysis.slice(0, displayText.length + 1));
       }, 4);
-    }
-
+    } 
+    
   }, [displayText,analysis]);
 
   return (
-    <div className="flex bg-psychoffice bg-cover bg-center h-screen w-screenb py-8 px-8">
+    <div className="flex bg-psychoffice bg-cover bg-center h-screen w-screen py-8 px-8">
           {/* left column */}
           <div className="flex-grow-[.7] flex flex-col pl-20">
             <h1 className="font-serif tracking-wider text-6xl font-light pl-10 text-slate-200 shadow-md mb-6"
@@ -52,7 +55,7 @@ export default function Home() {
             </button>
             <textarea
               className="max-w-[95%] h-80 bg-black bg-opacity-50 border border-gray-600 rounded-md text-white p-2 mb-4"
-              value={displayText}
+              value={loading ? "Analyzing..." : displayText}
               readOnly
             />
         </div>
