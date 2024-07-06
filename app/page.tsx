@@ -8,11 +8,10 @@ export default function Home() {
   const [analysis, setAnalysis] = useState("");
  
 
-  async function generateWisdom() {
+  async function generateAnalysis() {
     try {
       const response = await axios.post('/api/generate-comments', { code });
-      setAnalysis(response.data.comments);
-      console.log(response.data.comments);  // Log the comments for debugging
+      setAnalysis(response.data.message);
     } catch (error) {
       console.log("Error generating comments: ", error);
       setAnalysis("The analyst just sighs, puffing on his cigarette. (Perhaps try a bit later)");
@@ -37,7 +36,7 @@ export default function Home() {
             />
             <button 
               className="bg-black bg-opacity-50 hover:bg-amber-800 hover:bg-opacity-80 rounded text-white font-mono w-16 mb-3 self-end mr-12"
-              onClick={generateWisdom}
+              onClick={generateAnalysis}
             >
               Enter
             </button>
