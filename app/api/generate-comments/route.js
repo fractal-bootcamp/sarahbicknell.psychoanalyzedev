@@ -1,15 +1,22 @@
-import { NextResponse } from "next/server";
-import axios from "axios";
+import OpenAI from 'openai';
+import { ReadableStream } from 'web-streams-polyfill/ponyfill/es6';
+
+// create openai client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function POST(request) {
     try {
-        const { code } = await request.json();  // Parse the JSON body from the request
+        const { code } = await request.json();
 
-        console.log("Received code:", code);  // Log the received code
-        console.log("OpenAI API Key:", process.env.OPENAI_API_KEY ? "Loaded" : "Not Loaded");  // Check if the API key is loaded
+        console.log("Received code:", code);
+        console.log("OpenAI API Key:", process.env.OPENAI_API_KEY ? "Loaded" : "Not Loaded");
 
-        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-            model: "gpt-4o",
+        // prompt openai chat completion
+        const response = await openai.chat.completions.create({
+            model: "gpt-4",
+            stream: true,
             messages: [
                 {
                     role: "system",
@@ -22,18 +29,21 @@ export async function POST(request) {
             ],
             max_tokens: 1500,
             temperature: 0.7,
-        }, {
-            headers: {
-              'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-            }
         });
-    
-        const message = response.data.choices[0].message.content;
-        console.log(message);
-        return NextResponse.json({ message });
+        console.log("Openai response: ", response);
+            for await (const chunk of response) {
+                process.stdout.write(chunk.choices[0]?.delta?.content || '');
+
+            };
+
+        // // Respond with the stream
+        // return new Response(ReadableStream.from(response.data.choices[0]?.delta.content));
 
     } catch (error) {
         console.error('Error generating comments:', error.response?.data || error.message || error);
-        return NextResponse.json({ error: 'Failed to generate comments' }, { status: 500 });
+        return new Response(JSON.stringify({ error: 'Failed to generate comments' }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+        });
     }
 }
