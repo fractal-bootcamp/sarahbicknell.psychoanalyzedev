@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
-import { ReadableStream } from 'web-streams-polyfill/ponyfill/es6';
+import bodyparser from 'body-parser';   
+import cors from 'cors';
 
 // create openai client
 const openai = new OpenAI({
@@ -14,7 +15,7 @@ export async function POST(request) {
         console.log("OpenAI API Key:", process.env.OPENAI_API_KEY ? "Loaded" : "Not Loaded");
 
         // prompt openai chat completion
-        const response = await openai.chat.completions.create({
+        const getStreamingCompletion = await openai.chat.completions.create({
             model: "gpt-4",
             stream: true,
             messages: [
@@ -30,11 +31,12 @@ export async function POST(request) {
             max_tokens: 1500,
             temperature: 0.7,
         });
-        console.log("Openai response: ", response);
-            for await (const chunk of response) {
-                process.stdout.write(chunk.choices[0]?.delta?.content || '');
-
-            };
+        let starttime = Date.now();
+         for await (const part of stream) {
+            const chunkTime = (Date.now() - starttime) / 1000;
+            process.stdout.write(JSON.stringify(part.choices[0]?.delta || ""));
+            console.log(" chunk time:", chunkTime);
+        }
 
         // // Respond with the stream
         // return new Response(ReadableStream.from(response.data.choices[0]?.delta.content));

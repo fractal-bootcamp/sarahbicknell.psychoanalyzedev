@@ -1,26 +1,10 @@
 'use client';
 
-import { useState, useEffect} from "react";
-import { useCompletion } from 'ai/react';
+import {useChat} from 'ai/react';
 
 export default function Home() {
-  const [code, setCode] = useState("");
-  
-  const { complete, completion, isLoading } = useCompletion({
-    api: '/api/generate-comments',
-    body: { code },
-  });
+  const  {messages, input, handleInputChange, handleSubmit} = useChat()
 
-  async function generateAnalysis() {
-    await complete(code);
-  }
-
-  
-  // Log the completion and loading state
-  useEffect(() => {
-    console.log("Completion:", completion);
-    console.log("Is Loading:", isLoading);
-  }, [completion, isLoading]);
 
   return (
     <div className="flex flex-col min-h-screen w-screen bg-psychoffice bg-cover bg-center p-4 md:p-8">
@@ -33,23 +17,32 @@ export default function Home() {
   
       <div className="flex flex-col md:flex-row flex-grow">
         <div className="flex-grow md:w-[70%] flex flex-col md:pr-8 order-last md:order-first">
-          <textarea
-            className="w-full h-32 sm:h-36 md:h-40 bg-black font-mono bg-opacity-50 border border-gray-600 rounded-md text-white p-2 mb-4"
-            value={code}
-            onChange={(event) => setCode(event.target.value)}
-            placeholder="For some strange reason, you think showing your analyst a code snippet might be enlightening... (paste code here)"
-            spellCheck="false"
-          />
-          <button 
-            className="bg-black bg-opacity-50 hover:bg-amber-800 hover:bg-opacity-80 rounded text-white font-mono w-16 mb-3 self-end"
-            onClick={generateAnalysis}
-          >
-            Enter
-          </button>
+        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row flex-grow">
+            <textarea
+              className="w-full h-32 sm:h-36 md:h-40 bg-black font-mono bg-opacity-50 border border-gray-600 rounded-md text-white p-2 mb-4"
+              value={input}
+              onChange={handleInputChange}
+              placeholder="For some strange reason, you think showing your analyst a code snippet might be enlightening... (paste code here)"
+              spellCheck="false"
+            />
+            <button 
+              className="bg-black bg-opacity-50 hover:bg-amber-800 hover:bg-opacity-80 rounded text-white font-mono w-16 mb-3 self-end"
+              type="submit"
+            >
+              Enter
+            </button>
+          </form>
           <div
             className="w-full h-64 sm:h-72 md:h-80 bg-black font-serif bg-opacity-50 border border-gray-600 rounded-md text-white p-2 mb-4 overflow-auto"
           >
-            {isLoading ? "Analyzing..." : completion}
+            {
+              messages.map(m => (
+                <div key={m.id} className="whitespace-pre-wrap mb-2">
+                  {m.role === 'user' ? 'You: ' : 'Analyst: '}
+                  {m.content}
+                </div>
+              ))
+            }
           </div>
         </div>
         
