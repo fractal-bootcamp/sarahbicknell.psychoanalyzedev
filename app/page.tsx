@@ -3,7 +3,7 @@
 import {useChat} from 'ai/react';
 
 export default function Home() {
-  const  {messages, input, handleInputChange, handleSubmit} = useChat()
+  const  {messages, input, handleInputChange, handleSubmit, isLoading} = useChat()
 
 
   return (
@@ -35,14 +35,23 @@ export default function Home() {
           <div
             className="w-full h-64 sm:h-72 md:h-80 bg-black font-serif bg-opacity-50 border border-gray-600 rounded-md text-white p-2 mb-4 overflow-auto"
           >
-            {
-              messages.map(m => (
-                <div key={m.id} className="whitespace-pre-wrap mb-2">
-                  {m.role === 'user' ? 'You: ' : 'Analyst: '}
-                  {m.content}
-                </div>
-              ))
-            }
+            {(() => {
+              const lastAnalystMessage = messages
+                .filter(m => m.role === 'assistant')
+                .pop();
+              
+              if (lastAnalystMessage) {
+                return (
+                  <div className="whitespace-pre-wrap mb-2">
+                    {lastAnalystMessage.content}
+                  </div>
+                );
+              } else if (isLoading) {
+                return <div>The analyst is pondering your code...</div>;
+              } else {
+                return <div>Await the analyst's insights...</div>;
+              }
+            })()}
           </div>
         </div>
         
