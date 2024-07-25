@@ -17,7 +17,7 @@ export default function Home() {
   
       <div className="flex flex-col md:flex-row flex-grow">
         <div className="flex-grow md:w-[70%] flex flex-col md:pr-8 order-last md:order-first">
-        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row flex-grow">
+        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row ">
             <textarea
               className="w-full h-32 sm:h-36 md:h-40 bg-black font-mono bg-opacity-50 border border-gray-600 rounded-md text-white p-2 mb-4"
               value={input}
@@ -33,7 +33,7 @@ export default function Home() {
             </button>
           </form>
           <div
-            className="w-full h-64 sm:h-72 md:h-80 bg-black font-serif bg-opacity-50 border border-gray-600 rounded-md text-white p-2 mb-4 overflow-auto"
+            className="w-full h-64 sm:h-72 md:h-80 bg-black font-mono bg-opacity-50 border border-gray-600 rounded-md text-white p-2 mb-4 overflow-auto"
           >
             {(() => {
               const lastAnalystMessage = messages
