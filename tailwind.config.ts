@@ -11,6 +11,9 @@ const config: Config = {
       backgroundImage: {
         'psychoffice': "url('/psychoffice.webp')",
       },
+      screens: {
+        'lg': '1240px'
+      }
     },
   },
   plugins: [],
