@@ -62,7 +62,7 @@ export default function Home() {
                   </div>
                 );
               } else if (isLoading) {
-                return <div>The analyst is pondering your code...</div>;
+                return <div>Pondering...</div>;
               } else {
                 return <div>Await the analyst's insights...</div>;
               }
