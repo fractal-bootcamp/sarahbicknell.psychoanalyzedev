@@ -64,7 +64,7 @@ export default function Home() {
               } else if (isLoading) {
                 return <div>Pondering...</div>;
               } else {
-                return <div>Await the analyst's insights...</div>;
+                return <div>{`Await the analyst's insights...`}</div>;
               }
             })()}
           </div>
