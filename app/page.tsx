@@ -1,10 +1,60 @@
 'use client';
-
+import { useState, useEffect, useCallback } from 'react';
 import {useChat} from 'ai/react';
 
-export default function Home() {
-  const  {messages, input, handleInputChange, handleSubmit, isLoading} = useChat()
+function useSlowChat(delay = 25) {
+  const [slowMessage, setSlowMessage] = useState('');
+  const chat = useChat();
 
+  const slowStreamEffect = useCallback(() => {
+    if (chat.messages.length === 0) return;
+
+    const lastMessage = chat.messages[chat.messages.length - 1];
+    if (lastMessage.role !== 'assistant') return;
+
+    let index = slowMessage.length;
+    const intervalId = setInterval(() => {
+      if (index < lastMessage.content.length) {
+        setSlowMessage(lastMessage.content.slice(0, index + 1));
+        index++;
+      } else {
+        clearInterval(intervalId);
+      }
+    }, delay);
+
+    return () => clearInterval(intervalId);
+  }, [chat.messages, slowMessage, delay]);
+
+  useEffect(slowStreamEffect, [slowStreamEffect]);
+
+  return { 
+    ...chat,
+    messages: [
+      ...chat.messages.slice(0, -1),
+      { ...chat.messages[chat.messages.length - 1], content: slowMessage }
+    ]
+  };
+}
+
+export default function Home() {
+  const { messages, input, handleInputChange, handleSubmit: originalHandleSubmit, isLoading } = useSlowChat(50);
+  const [inputValue, setInputValue] = useState(input); // Initialize with the input from useChat
+
+  const handleInputChangeLocal = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(e.target.value);
+    handleInputChange(e); // Call the original handleInputChange to keep useChat in sync
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    originalHandleSubmit(e); // Call the original handleSubmit
+    // Do not clear inputValue here
+  };
+
+  // Update inputValue when messages change (e.g., after a response)
+  useEffect(() => {
+    setInputValue(input); 
+  }, []); 
 
   return (
     <div className="flex flex-col min-h-screen min-w-full bg-psychoffice bg-cover bg-center p-8 lg:p-8">
@@ -33,22 +83,22 @@ export default function Home() {
           <form onSubmit={handleSubmit} className="flex flex-col">
             <div className='flex flex-col'>
               <textarea
-                className="w-full max-h-[30vh] min-h-[20vh] sm:h-36 xl:h-44 bg-[#1D0902] focus:ring-amber-500 font-mono bg-opacity-50 focus:!ring-offset-0 border border-[#4A2F25] rounded-md focus:border-transparent focus:ring-0 placeholder-neutral-300 text-neutral-100 p-2 mb-4"
-                value={input}
-                onChange={handleInputChange}
+                className="w-full max-h-[30vh] min-h-[20vh] sm:h-36 xl:h-44 bg-[#1D0902] focus:ring-amber-500 font-mono bg-opacity-85 focus:!ring-offset-0 border border-[#4A2F25] rounded-md focus:border-transparent focus:ring-0 placeholder-neutral-300 text-neutral-100 p-2 mb-4"
+                value={inputValue}
+                onChange={handleInputChangeLocal}
                 placeholder="For some strange reason, you think showing your analyst a code snippet might be enlightening... (paste code here)"
                 spellCheck="false"
               />
               <button 
-                className="bg-[#1D0902] bg-opacity-50 hover:bg-amber-900 hover:bg-opacity-80 rounded mr-4 text-neutral-100 font-mono w-16 mb-3 transition hover:scale-110 self-end"
+                className="bg-amber-950 bg-opacity-75 hover:bg-amber-900 hover:bg-opacity-80 rounded mr-6 lg:mr-10 text-neutral-100 font-mono text-xl px-1 mb-3 transition hover:scale-110 self-end"
                 type="submit"
               >
-                Enter
+                Analyze
               </button>
             </div>
           </form>
-          <div
-            className="w-full h-64 sm:h-72 lg:h-80 xl:h-[40vh] bg-[#1D0902] font-mono bg-opacity-50 border border-[#4A2F25] rounded-md  text-neutral-100 p-2 mb-4 overflow-auto"
+          <div 
+            className="w-full h-64 sm:h-72 lg:h-80 xl:h-[40vh] bg-[#1D0902] font-mono bg-opacity-85 border border-[#4A2F25] rounded-md  text-neutral-100 p-2 mb-4 overflow-auto"
           >
             {(() => {
               const lastAnalystMessage = messages
@@ -73,3 +123,11 @@ export default function Home() {
     </div>
   );
 }
+
+
+//greater opacity text background
+//change button to be more visible and maybe called Analyze 
+//make it slower or pause between actions to create suspense, with a button that says "Continue doctor" or something like that 
+//can hold the display text in a different state variable to do this 
+//super extra cool: puffing cigar frame 
+//brian: breakpoint too soon 
