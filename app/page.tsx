@@ -1,8 +1,9 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import {useChat} from 'ai/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-function useSlowChat(delay = 25) {
+function useSlowChat(delay = 15) {
   const [slowMessage, setSlowMessage] = useState('');
   const chat = useChat();
 
@@ -39,6 +40,14 @@ function useSlowChat(delay = 25) {
 export default function Home() {
   const { messages, input, handleInputChange, handleSubmit: originalHandleSubmit, isLoading } = useSlowChat(50);
   const [inputValue, setInputValue] = useState(input); // Initialize with the input from useChat
+  const [currentImage, setCurrentImage] = useState('/analyst.webp');
+  const [isFirstImage, setIsFirstImage] = useState(true);
+
+  const toggleImage = () => {
+    setIsFirstImage(!isFirstImage);
+    setCurrentImage(isFirstImage ? '/smoking_analyst.webp' : '/analyst.webp');
+  };
+    
 
   const handleInputChangeLocal = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
@@ -48,6 +57,7 @@ export default function Home() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     originalHandleSubmit(e); // Call the original handleSubmit
+    toggleImage()
     // Do not clear inputValue here
   };
 
@@ -71,12 +81,22 @@ export default function Home() {
   
         {/* Image */}
         <div className="w-full lg:w-1/3 order-2 lg:order-3 flex flex-shrink justify-center items-center mb-4  lg:mb-0 ">
-          <img 
-            src="/analyst.webp" 
-            alt="Analyst" 
-            className="h-32 w-32 lg:h-auto lg:w-auto lg:max-h-[80vh] xl:max-h-[85vh] rounded-full lg:rounded-3xl object-cover shadow-[0_0_10px_rgba(255,255,255,3)] lg:shadow-none" 
-          />
-        </div>
+          <AnimatePresence mode="wait">
+            <motion.img 
+              key={currentImage}
+              src={currentImage} 
+              alt="Analyst" 
+              className="h-32 w-32 lg:h-auto lg:w-auto lg:max-h-[80vh] xl:max-h-[85vh] rounded-full lg:rounded-3xl object-cover shadow-[0_0_10px_rgba(255,255,255,3)] lg:shadow-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                type: "tween",
+                duration: 1,
+            }}
+            />
+            </AnimatePresence>
+          </div>
   
         {/* Text boxes */}
         <div className="w-full lg:w-2/3 order-3 lg:order-2 md:mr-8 lg:mr-4">
@@ -98,7 +118,7 @@ export default function Home() {
             </div>
           </form>
           <div 
-            className="w-full h-64 sm:h-72 lg:h-80 xl:h-[40vh] bg-[#1D0902] font-mono bg-opacity-85 border border-[#4A2F25] rounded-md  text-neutral-100 p-2 mb-4 overflow-auto"
+            className="w-full h-64 sm:h-72 lg:h-80 xl:h-[40vh] bg-[#1D0902] font-mono bg-opacity-85 border border-[#4A2F25] rounded-md  text-neutral-100 p-2 mb-2 overflow-auto"
           >
             {(() => {
               const lastAnalystMessage = messages
@@ -112,12 +132,13 @@ export default function Home() {
                   </div>
                 );
               } else if (isLoading) {
-                return <div>Pondering...</div>;
+                return <div>Analyzing...</div>;
               } else {
-                return <div>{`Await the analyst's insights...`}</div>;
+                return <div>{`Await the doctor's insights...`}</div>;
               }
             })()}
           </div>
+          <p className='text-neutral-100 text-opacity-85 font-mono text-sm font-thin text-right pr-4 lg:text-left lg:pl-4'> made with ♡ by <a className='hover:underline' href="https://hyperdiscogirl.netlify.app/">disco</a></p>
         </div>
       </div>
     </div>
