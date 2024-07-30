@@ -103,17 +103,18 @@ export default function Home() {
 
   const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      await fetch('/api/log-input', {
+    const logPromise = fetch('/api/log-input', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input: inputValue })
-      });
-    } catch (error) {
+      }).catch (error => {
       console.error('Failed to log input:', error);
-    }
+    })
     originalHandleSubmit(e); // Call the original handleSubmit
+
+    await logPromise;
   };
+
 
   // Update inputValue when messages change (e.g., after a response)
   useEffect(() => {
