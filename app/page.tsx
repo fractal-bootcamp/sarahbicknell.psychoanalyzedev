@@ -186,7 +186,7 @@ export default function Home() {
               }
             })()}
           </div>
-          <p className='text-neutral-100 text-opacity-85 font-mono text-sm xl:text-md font-thin text-right pr-4 lg:text-left lg:pl-4'> Made with <a className='hover:animate-pulse' href="https://en.wikipedia.org/wiki/Love">♥</a> by <a className='hover:underline' href="https://hyperdiscogirl.netlify.app/">Disco</a></p>
+          <p className='text-neutral-100 text-opacity-85 font-mono text-sm xl:text-md font-thin text-right pr-4 lg:text-left lg:pl-4'> Made with <a className='hover:animate-pulse' href="https://en.wikipedia.org/wiki/Love">♡</a> by <a className='hover:underline' href="https://hyperdiscogirl.netlify.app/">Disco</a></p>
         </div>
       </div>
     </div>
