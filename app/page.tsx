@@ -101,8 +101,17 @@ export default function Home() {
     handleInputChange(e); // Call the original handleInputChange to keep useChat in sync
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    try {
+      await fetch('/api/log-input', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: inputValue })
+      });
+    } catch (error) {
+      console.error('Failed to log input:', error);
+    }
     originalHandleSubmit(e); // Call the original handleSubmit
   };
 
